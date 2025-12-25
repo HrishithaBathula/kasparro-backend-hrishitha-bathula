@@ -1,18 +1,19 @@
-version: "3.9"
-
 services:
   api:
     build: .
+    container_name: kasparro-api
     ports:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/kasparro
       COINPAPRIKA_API_KEY: ${COINPAPRIKA_API_KEY}
+      BASE_URL: http://localhost:8000
     depends_on:
       - db
 
   db:
     image: postgres:15
+    container_name: kasparro-db
     restart: always
     environment:
       POSTGRES_USER: postgres

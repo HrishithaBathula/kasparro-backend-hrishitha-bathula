@@ -1,3 +1,4 @@
+import os
 import time
 import uuid
 from core.database import init_db
@@ -7,11 +8,23 @@ from core.database import get_db
 from ingestion.coinpaprika_ingest import ingest_coinpaprika
 from api.routes.data import router as data_router
 
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
+
 
 app = FastAPI(title="Kasparro Backend Assignment")
 app.include_router(data_router)
 
-
+@app.get("/")
+def root():
+    return {
+        "service": "Kasparro Backend API",
+        "available_endpoints": {
+            "health": "/health",
+            "data": "/data",
+            "stats": "/stats"
+        }
+    }
+    
 @app.get("/health")
 def health_check(db=Depends(get_db)):
     start = time.time()
@@ -54,6 +67,15 @@ def etl_stats(db=Depends(get_db)):
 @app.on_event("startup")
 def startup():
     print(">>> Startup triggered")
+
+    print("\n Kasparro API is running!", flush=True)
+    print(f" API Base URL   : {BASE_URL}", flush=True)
+    print(f" Health Check  : {BASE_URL}/health", flush=True)
+    print(f" Data Endpoint : {BASE_URL}/data", flush=True)
+    print(f" Stats Endpoint: {BASE_URL}/stats\n", flush=True)
+
     init_db()
+    ingest_coinpaprika()
+
    
 

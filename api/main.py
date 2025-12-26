@@ -68,14 +68,23 @@ def etl_stats(db=Depends(get_db)):
 def startup():
     print(">>> Startup triggered")
 
-    print("\n Kasparro API is running!", flush=True)
-    print(f" API Base URL   : {BASE_URL}", flush=True)
-    print(f" Health Check  : {BASE_URL}/health", flush=True)
-    print(f" Data Endpoint : {BASE_URL}/data", flush=True)
-    print(f" Stats Endpoint: {BASE_URL}/stats\n", flush=True)
+    # Detect Railway public URL
+    railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
+
+    if railway_domain:
+        BASE_URL = f"https://{railway_domain}"
+    else:
+        BASE_URL = "http://localhost:8000"
+
+    print("\nKasparro API is running!")
+    print(f"API Base URL   : {BASE_URL}", flush=True)
+    print(f"Health Check  : {BASE_URL}/health", flush=True )
+    print(f"Data Endpoint : {BASE_URL}/data", flush=True)
+    print(f"Stats Endpoint: {BASE_URL}/stats\n", flush=True)
 
     init_db()
     ingest_coinpaprika()
+
 
    
 
